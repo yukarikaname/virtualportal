@@ -1,0 +1,369 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+      "shouldTranslate" : false
+    },
+    "(migrated to new Training tab)" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld%%" : {
+      "shouldTranslate" : false
+    },
+    "• Collect diverse scenarios (different times, locations)" : {
+
+    },
+    "• Export regularly to avoid memory limits" : {
+
+    },
+    "• Monitor performance in Statistics" : {
+
+    },
+    "• Need 100+ samples for meaningful training" : {
+
+    },
+    "4K (3840×2160)" : {
+      "shouldTranslate" : false
+    },
+    "30 FPS" : {
+      "shouldTranslate" : false
+    },
+    "60 FPS" : {
+      "shouldTranslate" : false
+    },
+    "480p (Fast)" : {
+
+    },
+    "720p (1280×720)" : {
+      "shouldTranslate" : false
+    },
+    "1080p (1920×1080)" : {
+      "shouldTranslate" : false
+    },
+    "About" : {
+
+    },
+    "About Virtual Portal" : {
+
+    },
+    "About: %@" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add Memory" : {
+
+    },
+    "Advanced" : {
+
+    },
+    "After training on macOS, import the trained Core ML model back to iOS. The character will use it for better predictions." : {
+
+    },
+    "All" : {
+
+    },
+    "All training happens directly on your device using a simple neural network. No data is sent to the cloud." : {
+
+    },
+    "Blend Shapes:" : {
+
+    },
+    "Camera" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Capture" : {
+
+    },
+    "Cel Shading" : {
+
+    },
+    "Character" : {
+
+    },
+    "Clear All Memories" : {
+
+    },
+    "Comma-separated keywords" : {
+
+    },
+    "Comma-separated keywords (e.g., preference, food, hobby)" : {
+
+    },
+    "Content" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Conversation snippet" : {
+
+    },
+    "Data Collection" : {
+
+    },
+    "Data Exported Successfully" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Done" : {
+
+    },
+    "e.g., Alice, coffee shop, Monday" : {
+
+    },
+    "e.g., preference, food, hobby" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit Memory" : {
+
+    },
+    "Enable autonomous learning systems (Idle Behavior, Blend Shapes, Poses) to collect behavior samples automatically as you interact with the character." : {
+
+    },
+    "Entities" : {
+
+    },
+    "Experience your character in mixed reality" : {
+
+    },
+    "Export & Train" : {
+
+    },
+    "Export collected data as JSON, transfer to your Mac, and run the training script:\n\npython3 train_on_macos.py" : {
+
+    },
+    "Export Complete" : {
+
+    },
+    "Export Data" : {
+
+    },
+    "File saved to:" : {
+
+    },
+    "Filter by Tag" : {
+
+    },
+    "Frame Rate" : {
+
+    },
+    "Frequent" : {
+
+    },
+    "General" : {
+
+    },
+    "Generate One" : {
+
+    },
+    "Grant" : {
+
+    },
+    "High Importance" : {
+
+    },
+    "How Training Works" : {
+
+    },
+    "Idle" : {
+
+    },
+    "Import Models" : {
+
+    },
+    "Importance" : {
+
+    },
+    "Infrequent" : {
+
+    },
+    "Keywords" : {
+
+    },
+    "Large" : {
+
+    },
+    "Legacy training stats" : {
+
+    },
+    "Licenses" : {
+
+    },
+    "Lip Sync:" : {
+
+    },
+    "Live Photo" : {
+
+    },
+    "Memories" : {
+
+    },
+    "Memory" : {
+
+    },
+    "Minimum Process Interval (s)" : {
+
+    },
+    "Model Rendering" : {
+
+    },
+    "Model Scale" : {
+
+    },
+    "Model selection disabled on this platform." : {
+
+    },
+    "Movement:" : {
+
+    },
+    "No memories found" : {
+
+    },
+    "No tags yet - memories will be tagged by the LLM" : {
+
+    },
+    "Object Occlusion" : {
+
+    },
+    "On-Device Learning" : {
+
+    },
+    "Original" : {
+
+    },
+    "People, places, things mentioned" : {
+
+    },
+    "People, places, things mentioned (e.g., Alice, coffee shop)" : {
+
+    },
+    "Permissions" : {
+
+    },
+    "Pinch to zoom • Double-tap to reset" : {
+
+    },
+    "Processing Resolution" : {
+
+    },
+    "Prompt" : {
+
+    },
+    "Prompt Suffix" : {
+
+    },
+    "Rate Performance (1-5)" : {
+
+    },
+    "Record Data" : {
+
+    },
+    "Report Issues" : {
+
+    },
+    "Reset to Defaults" : {
+
+    },
+    "Resolution" : {
+
+    },
+    "Running" : {
+
+    },
+    "Samples: %lld" : {
+
+    },
+    "Save" : {
+
+    },
+    "Save Location" : {
+
+    },
+    "Search memories..." : {
+
+    },
+    "Select a Character Model (USDZ)" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Skeleton:" : {
+
+    },
+    "Small" : {
+
+    },
+    "Speech Recognition" : {
+
+    },
+    "Sponsor" : {
+
+    },
+    "Start" : {
+
+    },
+    "Statistics" : {
+
+    },
+    "Stop" : {
+
+    },
+    "Tags" : {
+
+    },
+    "The app needs access to your camera and microphone for speech recognition to function." : {
+
+    },
+    "This app lets you interact with a virtual character using your camera and voice." : {
+
+    },
+    "Tips" : {
+
+    },
+    "Total Memories" : {
+
+    },
+    "Train Now" : {
+
+    },
+    "Training" : {
+
+    },
+    "Training Monitor" : {
+
+    },
+    "Training Report" : {
+
+    },
+    "Training: " : {
+
+    },
+    "View captured photo" : {
+
+    },
+    "Virtual Portal" : {
+
+    },
+    "VLM" : {
+
+    },
+    "Welcome to Virtual Portal" : {
+
+    }
+  },
+  "version" : "1.1"
+}
