@@ -1,0 +1,258 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+      "shouldTranslate" : false
+    },
+    "%lld%%" : {
+      "shouldTranslate" : false
+    },
+    "4K (3840×2160)" : {
+      "shouldTranslate" : false
+    },
+    "30 FPS" : {
+      "shouldTranslate" : false
+    },
+    "60 FPS" : {
+      "shouldTranslate" : false
+    },
+    "480p (Fast)" : {
+
+    },
+    "720p (1280×720)" : {
+      "shouldTranslate" : false
+    },
+    "1080p (1920×1080)" : {
+      "shouldTranslate" : false
+    },
+    "About" : {
+
+    },
+    "About Virtual Portal" : {
+
+    },
+    "Add Memory" : {
+
+    },
+    "Advanced" : {
+
+    },
+    "Auto Commentary" : {
+
+    },
+    "Back" : {
+
+    },
+    "Camera" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Cel Shading" : {
+
+    },
+    "Character" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete All" : {
+
+    },
+    "Delete All Memories" : {
+
+    },
+    "Delete all memories? This action cannot be undone." : {
+
+    },
+    "Describe the character's personality and behavior. This is used by the LLM to shape responses." : {
+
+    },
+    "Done" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit Memory" : {
+
+    },
+    "Essential" : {
+
+    },
+    "Extra Prompt" : {
+
+    },
+    "FAQ & Tutorials" : {
+
+    },
+    "Fast" : {
+
+    },
+    "Foundation model unavailable" : {
+
+    },
+    "Frame Rate" : {
+
+    },
+    "Frequent" : {
+
+    },
+    "General" : {
+
+    },
+    "Grant" : {
+
+    },
+    "Idle" : {
+
+    },
+    "Infrequent" : {
+
+    },
+    "Interrupt AI on User Speech" : {
+
+    },
+    "iOS devices are limited to 60 FPS for AR camera feeds due to hardware and power constraints. Higher frame rates would cause excessive battery drain and thermal issues without significant visual improvement for AR applications." : {
+
+    },
+    "Large" : {
+
+    },
+    "Licenses" : {
+
+    },
+    "Memories" : {
+
+    },
+    "Minimum Process Interval (s)" : {
+
+    },
+    "MMD → USDZ Tutorial" : {
+
+    },
+    "MMD → USDZ tutorial (YouTube)" : {
+
+    },
+    "Model Rendering" : {
+
+    },
+    "Model Scale" : {
+
+    },
+    "Model selection disabled on this platform." : {
+
+    },
+    "No memories yet." : {
+
+    },
+    "Object Occlusion" : {
+
+    },
+    "OK" : {
+
+    },
+    "Open Settings" : {
+
+    },
+    "Optional" : {
+
+    },
+    "Optional extra instructions appended to LLM prompts." : {
+
+    },
+    "Original" : {
+
+    },
+    "Permissions Required" : {
+
+    },
+    "Personality" : {
+
+    },
+    "Processing Resolution" : {
+
+    },
+    "Project on GitHub" : {
+
+    },
+    "Prompt" : {
+
+    },
+    "Prompt Editor" : {
+
+    },
+    "Report Issues" : {
+
+    },
+    "Resolution" : {
+
+    },
+    "Save" : {
+
+    },
+    "Select a Character Model (USDZ)" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Share App" : {
+
+    },
+    "Slow" : {
+
+    },
+    "Small" : {
+
+    },
+    "Speech Rate" : {
+
+    },
+    "Speech Recognition" : {
+
+    },
+    "Sponsor" : {
+
+    },
+    "Start" : {
+
+    },
+    "Stop" : {
+
+    },
+    "The device does not have the required on-device foundation model. The app will fall back to a simpler response mode. Open Settings to change model preferences." : {
+
+    },
+    "This app lets you interact with a virtual character using your camera and voice." : {
+
+    },
+    "TTS" : {
+
+    },
+    "View captured photo" : {
+
+    },
+    "Virtual Portal" : {
+
+    },
+    "VLM" : {
+
+    },
+    "We need a few permissions to provide basic functionality" : {
+
+    },
+    "Welcome to Virtual Portal" : {
+
+    },
+    "Why is 60 FPS the maximum frame rate?" : {
+
+    }
+  },
+  "version" : "1.1"
+}

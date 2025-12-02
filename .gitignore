@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/*.xcworkspace/
+
+*.xcodeproj/*.xcworkspace/*
+!*.xcodeproj/*.xcworkspace/contents.xcworkspacedata
+!*.xcodeproj/*.xcworkspace/xcshareddata/
+
+*.xcodeproj/*.xcworkspace/xcshareddata/*
+!*.xcodeproj/*.xcworkspace/xcshareddata/swiftpm/
+
+# FastVLM Model
+virtualportal/Models/VLM/FastVLM/model
