@@ -55,6 +55,21 @@ struct AboutView: View {
                         .foregroundColor(.secondary)
                 }
 #endif
+                DisclosureGroup("Why does my character model look weird/incorrect?") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("iOS's USDZ rendering logic has known issues:")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("placeholder")
+                        }
+                        .font(.callout)
+                        .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 8)
+                }
+                
                 if let tutorial = viewModel.mmdToUsdzTutorialURL {
                     Link(destination: tutorial) {
                         Label("MMD → USDZ tutorial (YouTube)", systemImage: "play.rectangle")

@@ -109,6 +109,29 @@ public class TextToSpeechManager: NSObject, ObservableObject {
         }
     }
     
+    /// Speak SSML markup
+    /// - Parameters:
+    ///   - ssml: Valid SSML string (e.g., from SSMLBuilder.build())
+    ///   - Note: Personal Voice is compatible with SSML. The voice property is set before SSML processing,
+    ///     allowing Personal Voice to be used with SSML prosody markup.
+    @MainActor
+    public func speakSSML(_ ssml: String) {
+        guard !ssml.isEmpty else { return }
+        
+        // SSML is not split - it's sent as a single utterance
+        speechQueue.append(ssml)
+        processQueue()
+    }
+    
+    /// Speak with SSMLBuilder convenience
+    /// - Parameters:
+    ///   - builder: Closure that builds SSML
+    @MainActor
+    public func speakWithSSML(_ builder: (SSMLBuilder) -> SSMLBuilder) {
+        let ssmlBuilder = builder(SSMLBuilder())
+        speakSSML(ssmlBuilder.build())
+    }
+    
     private func splitTextByPunctuation(_ text: String) -> [String] {
         var chunks: [String] = []
         var currentChunk = ""
@@ -151,7 +174,31 @@ public class TextToSpeechManager: NSObject, ObservableObject {
     
     @MainActor
     private func speakImmediately(_ text: String) {
-        let utterance = AVSpeechUtterance(string: text)
+        // Check if text is SSML (starts with <?xml or <speak)
+        let isSSML = text.trimmingCharacters(in: .whitespaces).hasPrefix("<?xml") || 
+                     text.trimmingCharacters(in: .whitespaces).hasPrefix("<speak")
+        
+        let utterance: AVSpeechUtterance
+        
+        if isSSML {
+            // Use SSML initialization (iOS 16.0+)
+            if #available(iOS 16.0, *) {
+                if let ssmlUtterance = AVSpeechUtterance(ssmlRepresentation: text) {
+                    utterance = ssmlUtterance
+                    print("Speaking SSML markup")
+                } else {
+                    print("Invalid SSML markup, falling back to plain text")
+                    utterance = AVSpeechUtterance(string: text)
+                }
+            } else {
+                // Fallback for older iOS versions
+                print("SSML not supported on this iOS version, using plain text")
+                utterance = AVSpeechUtterance(string: text)
+            }
+        } else {
+            // Plain text initialization
+            utterance = AVSpeechUtterance(string: text)
+        }
         
         // Use Personal Voice if available and enabled
         if usePersonalVoice, personalVoiceAvailable, let personalVoice = personalVoice {
@@ -160,19 +207,22 @@ public class TextToSpeechManager: NSObject, ObservableObject {
         } else {
             utterance.voice = AVSpeechSynthesisVoice()
             if usePersonalVoice && !personalVoiceAvailable {
-                // User has requested Personal Voice but it's not available; do not trigger any UI popups.
                 print("Personal Voice requested but not available, using default voice")
             }
         }
         
-        // Configure speech parameters (respect user-configured speech rate)
-        let rate = UserDefaults.standard.double(forKey: "speechRate")
-        if rate > 0 {
-            utterance.rate = Float(rate)
-        } else {
-            utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+        // Configure speech parameters
+        // NOTE: For SSML utterances, rate and pitchMultiplier are ignored
+        // Prosody is controlled via SSML tags instead
+        if !isSSML {
+            let rate = UserDefaults.standard.double(forKey: "speechRate")
+            if rate > 0 {
+                utterance.rate = Float(rate)
+            } else {
+                utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+            }
+            utterance.pitchMultiplier = 1.0
         }
-        utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
         
         // Configure audio session for playback

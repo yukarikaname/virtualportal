@@ -72,13 +72,14 @@ final class PermissionManager {
 
     /// Synchronous convenience check for both microphone and speech recognition.
     /// Returns a tuple `(microphone: Bool, speechRecognition: Bool)`.
+    @MainActor
     static func checkPermissions() -> (microphone: Bool, speechRecognition: Bool) {
         let micGranted = AVAudioApplication.shared.recordPermission == .granted
         let speechGranted = SFSpeechRecognizer.authorizationStatus() == .authorized
         return (micGranted, speechGranted)
     }
     
-    @MainActor static func requestSpeechRecognitionPermission(completion: @escaping @Sendable (Bool) -> Void) {
+    static func requestSpeechRecognitionPermission(completion: @escaping @Sendable (Bool) -> Void) {
         // Only request Speech Recognition permission (SFSpeechRecognizer) here.
         // Do not implicitly request the microphone - that must be requested separately
         // to avoid showing microphone permission UI when only speech recognition is needed.

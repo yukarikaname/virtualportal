@@ -54,39 +54,35 @@ public final class SpeechConversationManager: ObservableObject {
     }
 
     public func startSpeechRecognition() {
-        // Check permissions status
-        _ = PermissionManager.checkPermissions()
-
-        // Check if speech recognition is authorized
-        if !speech.isAuthorized {
-            print("Speech recognition not authorized. Please grant permissions.")
-            return
-        }
-
-        // Start continuous speech recognition handler
-        speech.onSentenceRecognized = { [weak self] sentence in
-            // Handle on background thread to avoid blocking UI
-            Task.detached { [weak self] in
-                await self?.handleUserSentence(sentence)
+        // Perform permission check on MainActor
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            
+            let perms = PermissionManager.checkPermissions()
+            
+            // Update speech authorization if needed
+            if !perms.speechRecognition || !perms.microphone {
+                print("Speech recognition not authorized. Mic: \(perms.microphone), Speech: \(perms.speechRecognition)")
             }
-        }
+            
+            // Start continuous speech recognition handler
+            self.speech.onSentenceRecognized = { [weak self] sentence in
+                // Handle on background thread to avoid blocking UI
+                Task.detached { [weak self] in
+                    await self?.handleUserSentence(sentence)
+                }
+            }
 
-        // Start speech recognition asynchronously
-        Task.detached(priority: .userInitiated) { [weak self] in
-            guard let self else { return }
-
-            let isAuthorized = await MainActor.run { self.speech.isAuthorized }
-            guard isAuthorized else {
-                print("Speech recognition not authorized yet")
+            // Check if authorized and start
+            guard self.speech.isAuthorized else {
+                print("Speech recognition will start once permissions are granted")
+                // The startRecording method will request permissions if needed
+                self.speech.start()
                 return
             }
 
             print("Starting speech recognition")
-
-            // Start speech recognition - the manager dispatches internally
-            await MainActor.run {
-                self.speech.start()
-            }
+            self.speech.start()
         }
     }
 
@@ -116,6 +112,26 @@ public final class SpeechConversationManager: ObservableObject {
             self.tts.speak(clean, streaming: false)
         }
     }
+    
+    /// Speak SSML markup with optional lip sync
+    public func speakSSML(_ ssml: String, withLipSync: Bool = true) {
+        Task { @MainActor in
+            // Note: SSML may contain markup that doesn't have plain text equivalent
+            // For lip sync, we can extract plain text or skip lip sync
+            if withLipSync {
+                // Extract plain text from SSML for lip sync approximation
+                let plainText = self.extractPlainTextFromSSML(ssml)
+                await self.lipSync.startLipSyncWithTTS(text: plainText)
+            }
+            self.tts.speakSSML(ssml)
+        }
+    }
+    
+    /// Speak using SSML builder with optional lip sync
+    public func speakWithSSML(withLipSync: Bool = true, builder: (SSMLBuilder) -> SSMLBuilder) {
+        let ssmlBuilder = builder(SSMLBuilder())
+        speakSSML(ssmlBuilder.build(), withLipSync: withLipSync)
+    }
 
     public func speakStreamingChunk(_ chunk: String, withLipSync: Bool = true) {
         Task { @MainActor in
@@ -128,6 +144,51 @@ public final class SpeechConversationManager: ObservableObject {
             }
             self.tts.speak(clean, streaming: false)
         }
+    }
+    
+    /// Speak a streaming chunk with SSML support
+    /// Converts text to SSML if it contains markup/emphasis, otherwise uses plain text
+    public func speakStreamingChunkWithSSML(_ chunk: String, withLipSync: Bool = true, tone: String = "friendly") {
+        Task { @MainActor in
+            let clean = Self.sanitize(chunk)
+            
+            // Check if chunk contains SSML markers or emphasis markers
+            let hasSSMLMarkers = clean.contains("*") || clean.contains("_") || clean.contains("<")
+            
+            if hasSSMLMarkers {
+                // Convert to SSML
+                let llmManager = LLMConversationManager.shared
+                let ssml = llmManager.convertToSSML(clean)
+                
+                if withLipSync {
+                    // Extract plain text for lip sync
+                    let plainText = self.extractPlainTextFromSSML(ssml)
+                    if !self.lipSync.isActive {
+                        await self.lipSync.startLipSyncWithTTS(text: plainText)
+                    }
+                }
+                
+                self.tts.speakSSML(ssml)
+            } else {
+                // Plain text - use normal TTS
+                if withLipSync {
+                    if !self.lipSync.isActive {
+                        await self.lipSync.startLipSyncWithTTS(text: clean)
+                    }
+                }
+                self.tts.speak(clean, streaming: false)
+            }
+        }
+    }
+    
+    /// Enable SSML mode for all streaming speech
+    private var useSSMLMode: Bool {
+        return UserDefaults.standard.bool(forKey: "useSSMLSpeech") ?? true
+    }
+    
+    /// Set whether to use SSML for speech
+    public func setUseSSML(_ enabled: Bool) {
+        UserDefaults.standard.set(enabled, forKey: "useSSMLSpeech")
     }
 
     public func stopSpeech() {
@@ -162,6 +223,54 @@ public final class SpeechConversationManager: ObservableObject {
         Task { @MainActor in
             self.isGenerating = generating
         }
+    }
+    
+    /// Extract plain text from SSML for lip sync purposes
+    private func extractPlainTextFromSSML(_ ssml: String) -> String {
+        var text = ssml
+        
+        // Remove XML declaration
+        text = text.replacingOccurrences(of: "<?xml[^?]*\\?>", with: "", options: .regularExpression)
+        
+        // Remove SSML tags but keep content
+        text = text.replacingOccurrences(of: "<speak>", with: "")
+        text = text.replacingOccurrences(of: "</speak>", with: "")
+        
+        // Remove prosody tags
+        text = text.replacingOccurrences(of: "<prosody[^>]*>", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "</prosody>", with: "")
+        
+        // Remove emphasis tags
+        text = text.replacingOccurrences(of: "<emphasis[^>]*>", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "</emphasis>", with: "")
+        
+        // Remove break tags
+        text = text.replacingOccurrences(of: "<break[^>]*/>", with: "", options: .regularExpression)
+        
+        // Remove voice tags
+        text = text.replacingOccurrences(of: "<voice[^>]*>", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "</voice>", with: "")
+        
+        // Remove say-as tags but keep content
+        text = text.replacingOccurrences(of: "<say-as[^>]*>", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "</say-as>", with: "")
+        
+        // Remove sentence/paragraph tags
+        text = text.replacingOccurrences(of: "<[sp]>", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "</[sp]>", with: "", options: .regularExpression)
+        
+        // Clean up HTML entities
+        text = text.replacingOccurrences(of: "&amp;", with: "&")
+        text = text.replacingOccurrences(of: "&lt;", with: "<")
+        text = text.replacingOccurrences(of: "&gt;", with: ">")
+        text = text.replacingOccurrences(of: "&quot;", with: "\"")
+        text = text.replacingOccurrences(of: "&apos;", with: "'")
+        
+        // Clean up whitespace
+        text = text.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        return text
     }
 }
 

@@ -13,7 +13,7 @@ import ARKit
 #endif
 
 /// ViewModel for AR scene management
-/// Coordinates between View layer and Model layer (CharacterModelController)
+/// Coordinates between View layer and Model layer (ModelRenderer)
 @MainActor
 public class ARViewModel: ObservableObject {
     
@@ -30,7 +30,7 @@ public class ARViewModel: ObservableObject {
     @Published public var indicatorAngle: Angle = .zero
     
     // MARK: - Dependencies
-    private let characterController = CharacterModelController.shared
+    private let characterController = ModelRenderer.shared
     //    private let positionController = PositionController.shared
     
     private var cancellables = Set<AnyCancellable>()
@@ -76,7 +76,7 @@ public class ARViewModel: ObservableObject {
     
     /// Reset AR session
     public func resetARSession() {
-        // Delegated to CharacterModelController via NotificationCenter
+        // Delegated to ModelRenderer via NotificationCenter
         NotificationCenter.default.post(name: Notification.Name("virtualportal.arConfigurationChanged"), object: nil)
     }
     

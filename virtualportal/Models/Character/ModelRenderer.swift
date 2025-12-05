@@ -1,5 +1,5 @@
 //
-//  CharacterModelController.swift
+//  ModelRenderer.swift
 //  virtualportal
 //
 //  Created by Yukari Kaname on 10/16/25.
@@ -13,14 +13,15 @@ import ARKit
 import Combine
 import Metal
 
-/// Centralized RealityKit-based AR scene controller
+/// Low-level RealityKit rendering backend
+/// Handles model loading, AR placement, shaders, and blendshapes
 /// Platform-specific functionality is in extensions:
-/// - CharacterModelController+iOS.swift
-/// - CharacterModelController+visionOS.swift
-/// - CharacterModelController+Shaders.swift
+/// - ModelRenderer+iOS.swift
+/// - ModelRenderer+visionOS.swift
+/// - ModelRenderer+Shaders.swift
 @MainActor
-public class CharacterModelController: ObservableObject {
-    public static let shared = CharacterModelController()
+public class ModelRenderer: ObservableObject {
+    public static let shared = ModelRenderer()
     
     // MARK: - Published Properties
     public internal(set) var hasPlacedModel: Bool = false
@@ -102,7 +103,7 @@ public class CharacterModelController: ObservableObject {
     internal func loadModelEntity(contentsOf url: URL) async throws -> ModelEntity {
         // Minimal checks - just load it
         guard !url.path.isEmpty else {
-            throw NSError(domain: "CharacterModelController", code: -1, 
+            throw NSError(domain: "ModelRenderer", code: -1, 
                          userInfo: [NSLocalizedDescriptionKey: "Invalid URL path"])
         }
         
@@ -205,7 +206,7 @@ public class CharacterModelController: ObservableObject {
         metalLibrary = nil
         metalDevice = nil
         
-        print("CharacterModelController reset")
+        print("ModelRenderer reset")
     }
     
     // MARK: - Blendshape Methods

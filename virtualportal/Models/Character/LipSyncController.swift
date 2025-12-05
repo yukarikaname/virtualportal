@@ -20,7 +20,7 @@ public class LipSyncController: NSObject, ObservableObject {
     @Published public var isActive: Bool = false
     
     // MARK: - Dependencies
-    private let characterController = CharacterModelController.shared
+    private let characterController = ModelRenderer.shared
     private let tts = TextToSpeechManager.shared
     
     // MARK: - Animation State

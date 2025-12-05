@@ -352,6 +352,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We needs camera access to have basic app experience.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Virtual Portal needs camera access to have basic app experience.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Virtual Portal needs Microphone permission to have a better conversation experience.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Virtual Portal needs Photo permission to save photos.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Virtual Portal needs Speech Recognition access to have basic app experience.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -408,6 +409,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We needs camera access to have basic app experience.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Virtual Portal needs camera access to have basic app experience.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Virtual Portal needs Microphone permission to have a better conversation experience.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Virtual Portal needs Photo permission to save photos.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Virtual Portal needs Speech Recognition access to have basic app experience.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

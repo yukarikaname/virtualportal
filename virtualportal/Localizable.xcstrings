@@ -121,6 +121,9 @@
     "iOS devices are limited to 60 FPS for AR camera feeds due to hardware and power constraints. Higher frame rates would cause excessive battery drain and thermal issues without significant visual improvement for AR applications." : {
 
     },
+    "iOS's USDZ rendering logic has known issues:" : {
+
+    },
     "Large" : {
 
     },
@@ -173,6 +176,9 @@
 
     },
     "Personality" : {
+
+    },
+    "placeholder" : {
 
     },
     "Processing Resolution" : {
@@ -248,6 +254,9 @@
 
     },
     "Welcome to Virtual Portal" : {
+
+    },
+    "Why does my character model look weird/incorrect?" : {
 
     },
     "Why is 60 FPS the maximum frame rate?" : {

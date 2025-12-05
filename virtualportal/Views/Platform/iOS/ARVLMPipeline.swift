@@ -30,7 +30,7 @@ class ARVLMPipeline {
         let currentTime = CACurrentMediaTime()
 
         // Skip VLM processing while loading model to reduce resource contention
-        guard !CharacterModelController.shared.isLoadingModel else {
+        guard !ModelRenderer.shared.isLoadingModel else {
             #if DEBUG
             let now = CACurrentMediaTime()
             if lastSkipReason != .loading || (now - lastSkipLogTime) >= skipLogCooldown {

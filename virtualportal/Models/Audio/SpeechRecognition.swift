@@ -40,8 +40,8 @@ public final class SpeechRecognitionManager: NSObject, ObservableObject {
             locale: Locale(identifier: Locale.preferredLanguages.first ?? "en-US")
         )
 
-        let perms = PermissionManager.checkPermissions()
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
+            let perms = PermissionManager.checkPermissions()
             self?.isAuthorized = perms.speechRecognition && perms.microphone
         }
     }
@@ -53,21 +53,24 @@ public final class SpeechRecognitionManager: NSObject, ObservableObject {
     public func startRecording() {
         guard !isRecording else { return }
 
-        let currentPerms = PermissionManager.checkPermissions()
-        let hasFullAccess = currentPerms.microphone && currentPerms.speechRecognition
-        
-        // Update state immediately
-        if isAuthorized != hasFullAccess {
-            self.isAuthorized = hasFullAccess
-        }
+        // Perform all permission checks on MainActor to avoid concurrency issues
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            
+            let currentPerms = PermissionManager.checkPermissions()
+            let hasFullAccess = currentPerms.microphone && currentPerms.speechRecognition
+            
+            // Update state immediately
+            if self.isAuthorized != hasFullAccess {
+                self.isAuthorized = hasFullAccess
+            }
 
-        // Check authorization status for "Not Determined" specifically
-        let authStatus = SFSpeechRecognizer.authorizationStatus()
-        if authStatus == .notDetermined {
-            print("Speech recognition permission not determined - requesting...")
-            Task { @MainActor in
+            // Check authorization status for "Not Determined" specifically
+            let authStatus = SFSpeechRecognizer.authorizationStatus()
+            if authStatus == .notDetermined {
+                print("Speech recognition permission not determined - requesting...")
                 PermissionManager.requestSpeechRecognitionPermission { [weak self] granted in
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         guard let self = self else { return }
                         self.isAuthorized = granted
                         if granted {
@@ -75,19 +78,15 @@ public final class SpeechRecognitionManager: NSObject, ObservableObject {
                         }
                     }
                 }
+                return
             }
-            return
-        }
 
-        guard hasFullAccess else {
-            print("Speech recognition not authorized. Mic: \(currentPerms.microphone), Speech: \(currentPerms.speechRecognition)")
-            // Optional: You could trigger a notification here to open settings
-            return
-        }
+            guard hasFullAccess else {
+                print("Speech recognition not authorized. Mic: \(currentPerms.microphone), Speech: \(currentPerms.speechRecognition)")
+                return
+            }
 
-        // Perform recording setup on the MainActor to avoid forced sync hops
-        Task { @MainActor [weak self] in
-            await self?.performStartRecordingAsync()
+            await self.performStartRecordingAsync()
         }
     }
 

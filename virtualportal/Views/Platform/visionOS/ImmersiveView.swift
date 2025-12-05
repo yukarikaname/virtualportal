@@ -15,7 +15,7 @@ struct ImmersiveView: View {
     // MARK: - ViewModels
     @StateObject private var settingsViewModel = SettingsViewModel()
     @StateObject private var arViewModel = ARViewModel()
-    @StateObject private var modelController = CharacterModelController.shared
+    @StateObject private var modelController = ModelRenderer.shared
     
     @Binding var isImmersiveSpaceShown: Bool
     

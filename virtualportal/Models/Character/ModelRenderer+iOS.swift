@@ -1,5 +1,5 @@
 //
-//  CharacterModelController+iOS.swift
+//  ModelRenderer+iOS.swift
 //  virtualportal
 //
 //  Created by Yukari Kaname on 11/8/25.
@@ -11,8 +11,8 @@ import RealityKit
 import ARKit
 import Combine
 
-/// iOS-specific AR functionality for CharacterModelController
-extension CharacterModelController {
+/// iOS-specific AR functionality for ModelRenderer
+extension ModelRenderer {
     
     // MARK: - AR Session Management
     
@@ -90,7 +90,7 @@ extension CharacterModelController {
         
         configuration.planeDetection = [.horizontal]
         configuration.environmentTexturing = .automatic
-        
+
         return configuration
     }
     
@@ -282,7 +282,10 @@ extension CharacterModelController {
                         self.modelAnchor = anchor
                         self.hasPlacedModel = true
                         
-//                        PositionController.shared.captureInitialTransform(entity)
+                        // Auto-detect bone naming convention for IK
+                        let detected = IKController.shared.autoDetectBoneNaming(from: entity)
+                        print("[ModelRenderer] Bone naming auto-detection: \(detected ? "successful" : "using default")")
+                        
                         
                         let placementDuration = CACurrentMediaTime() - placementStart
                         let totalDuration = CACurrentMediaTime() - loadStartTime

@@ -30,7 +30,7 @@ struct ModelLayerView: View {
     // MARK: - ViewModels
     @StateObject private var settingsViewModel = SettingsViewModel()
     @StateObject private var arViewModel = ARViewModel()
-    @StateObject private var modelController = CharacterModelController.shared
+    @StateObject private var modelController = ModelRenderer.shared
     @Environment(\.scenePhase) private var scenePhase
 
     // Show a blur overlay when the app becomes inactive/multitasking menu appears
@@ -125,6 +125,12 @@ struct ModelLayerView: View {
 
                 // Start a minimal AVCaptureSession to enable Camera Control interactions
                 cameraSessionManager.startCameraSession()
+                
+                // Setup iPhone 15+ capture button handler
+                CaptureButtonHandler.shared.setup { 
+                    NotificationCenter.default.post(name: Notification.Name("virtualportal.cameraCaptureRequested"), object: nil)
+                }
+                
                 // Register launch for rate prompt logic (RateManager will invoke in-app review when threshold reached)
                 Task { @MainActor in
                     RateManager.shared.registerLaunch()
@@ -138,6 +144,10 @@ struct ModelLayerView: View {
                 }
                 // Tear down minimal capture session used for Camera Control
                 cameraSessionManager.stopCameraSession()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("virtualportal.captureButtonPressed"))) { _ in
+                // iPhone 15+ capture button was pressed
+                NotificationCenter.default.post(name: Notification.Name("virtualportal.cameraCaptureRequested"), object: nil)
             }
             .onReceive(NotificationCenter.default.publisher(for: Notification.Name("virtualportal.cameraCaptureRequested"))) { _ in
                 // Capture: check camera permission first to avoid crashes when access is denied
@@ -275,10 +285,8 @@ struct ModelLayerView: View {
         let result = await photoCaptureHandler.handleCapture(image: image)
         // Create square thumbnail for display (no black bars)
         self.thumbnail = result.thumbnail
-        // Store full image for preview
+        // Store full image but don't show preview - just save to library
         self.capturedImage = result.fullImage
-        // Show photo preview
-        self.showPhotoPreview = true
 
         // Save the full original image to photo library. Location metadata is attached only
         // if the user granted location permission. We will request location permission at
@@ -362,7 +370,7 @@ private struct RealityKitARView: UIViewRepresentable {
         // Note: delegateQueue defaults to main queue when not set
         
         Task { @MainActor in
-            CharacterModelController.shared.configureARView(arView)
+            ModelRenderer.shared.configureARView(arView)
         }
         
         // Add coaching overlay for user guidance
@@ -396,7 +404,10 @@ private struct RealityKitARView: UIViewRepresentable {
                     return
                 }
                 arView.snapshot(saveToHDR: true) { image in
-                    completion(image)
+                    // Ensure completion is called on main thread to avoid concurrency issues
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
                 }
             }
         }
@@ -486,8 +497,8 @@ class Coordinator: NSObject, ARSessionDelegate {
         self.indicatorPosition = indicatorPosition
         self.indicatorAngle = indicatorAngle
         
-        CharacterModelController.shared.updateModel(modelName: modelName, modelScale: modelScale, applyCustomShader: applyCustomShader)
-        CharacterModelController.shared.updateObjectOcclusion(enabled: objectOcclusionEnabled)
+        ModelRenderer.shared.updateModel(modelName: modelName, modelScale: modelScale, applyCustomShader: applyCustomShader)
+        ModelRenderer.shared.updateObjectOcclusion(enabled: objectOcclusionEnabled)
     }
     
     func update(
@@ -513,20 +524,20 @@ class Coordinator: NSObject, ARSessionDelegate {
             currentModelScale = modelScale
             currentApplyCustomShader = applyCustomShader
             
-            CharacterModelController.shared.updateModel(modelName: modelName, modelScale: modelScale, applyCustomShader: applyCustomShader)
+            ModelRenderer.shared.updateModel(modelName: modelName, modelScale: modelScale, applyCustomShader: applyCustomShader)
         } else if scaleChanged {
             currentModelScale = modelScale
-            CharacterModelController.shared.updateModelScale(modelScale)
+            ModelRenderer.shared.updateModelScale(modelScale)
         }
         
         if shaderChanged {
             currentApplyCustomShader = applyCustomShader
-            CharacterModelController.shared.updateShader(applyCustomShader)
+            ModelRenderer.shared.updateShader(applyCustomShader)
         }
         
         if occlusionChanged {
             currentObjectOcclusionEnabled = objectOcclusionEnabled
-            CharacterModelController.shared.updateObjectOcclusion(enabled: objectOcclusionEnabled)
+            ModelRenderer.shared.updateObjectOcclusion(enabled: objectOcclusionEnabled)
         }
     }
     
@@ -556,7 +567,7 @@ class Coordinator: NSObject, ARSessionDelegate {
         // Process plane anchors - already on main queue
         for anchor in anchors {
             if let planeAnchor = anchor as? ARPlaneAnchor {
-                CharacterModelController.shared.handlePlaneDetection(
+                ModelRenderer.shared.handlePlaneDetection(
                     planeAnchor,
                     modelName: currentModelName,
                     modelScale: currentModelScale,
@@ -570,7 +581,7 @@ class Coordinator: NSObject, ARSessionDelegate {
         // Process plane updates - already on main queue
         for anchor in anchors {
             if let planeAnchor = anchor as? ARPlaneAnchor {
-                CharacterModelController.shared.updatePlaneAnchor(
+                ModelRenderer.shared.updatePlaneAnchor(
                     planeAnchor,
                     modelName: currentModelName,
                     modelScale: currentModelScale,
@@ -590,7 +601,7 @@ class Coordinator: NSObject, ARSessionDelegate {
     
     private func updateOffscreenIndicator() {
         guard let arView = arView,
-              let modelEntity = CharacterModelController.shared.modelEntity,
+              let modelEntity = ModelRenderer.shared.modelEntity,
               modelEntity.isAnchored,
               let isIndicatorVisible = isIndicatorVisible,
               let indicatorPosition = indicatorPosition,

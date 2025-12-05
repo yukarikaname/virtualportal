@@ -115,11 +115,83 @@ public final class LLMConversationManager {
         lines.append("- Respond as yourself (use 'I')")
         lines.append("- Be conversational and brief (1-2 sentences)")
         lines.append("- NO emojis or emoticons")
-        lines.append("- Commands optional: [COMMAND:move,x,y,z] [COMMAND:pose,wave,2.0]")
+        lines.append("")
+        lines.append("ACTIONS (optional):")
+        lines.append("[ACTION:pose,wave] [ACTION:pose,happy] [ACTION:pose,think]")
+        lines.append("[ACTION:move,x,y,z] [ACTION:look,user] [ACTION:expression,smile]")
         lines.append("")
         lines.append("Respond:")
 
         return lines.joined(separator: "\n")
+    }
+
+    // MARK: - SSML Conversion
+    
+    /// Convert a response with emphasis markers to SSML
+    /// Supports markers like: *important*, **very important**, _soft_, etc.
+    public func convertToSSML(_ text: String) -> String {
+        var result = text
+        
+        // Handle **bold** as strong emphasis
+        result = result.replacingOccurrences(
+            of: "\\*\\*([^*]+)\\*\\*",
+            with: "<emphasis level=\"strong\">$1</emphasis>",
+            options: .regularExpression
+        )
+        
+        // Handle *emphasis*
+        result = result.replacingOccurrences(
+            of: "(?<!\\*)\\*([^*]+)\\*(?!\\*)",
+            with: "<emphasis level=\"moderate\">$1</emphasis>",
+            options: .regularExpression
+        )
+        
+        // Handle _soft_ as reduced emphasis
+        result = result.replacingOccurrences(
+            of: "_([^_]+)_",
+            with: "<emphasis level=\"reduced\">$1</emphasis>",
+            options: .regularExpression
+        )
+        
+        return "<?xml version=\"1.0\"?><speak>\(result)</speak>"
+    }
+    
+    /// Generate conversational SSML with natural prosody
+    /// - Parameters:
+    ///   - text: The text to speak
+    ///   - tone: "friendly", "serious", "excited", "calm"
+    public func generateConversationalSSML(_ text: String, tone: String = "friendly") -> String {
+        let builder = SSMLBuilder()
+        
+        switch tone {
+        case "friendly":
+            return builder
+                .pitch("high", content: text)
+                .build()
+                
+        case "serious":
+            return builder
+                .rate("slow", content: text)
+                .pitch("low", content: text)
+                .build()
+                
+        case "excited":
+            return builder
+                .rate("fast", content: text)
+                .pitch("high", content: text)
+                .volume("loud", content: text)
+                .build()
+                
+        case "calm":
+            return builder
+                .rate("slow", content: text)
+                .pitch("medium", content: text)
+                .volume("soft", content: text)
+                .build()
+                
+        default:
+            return builder.text(text).build()
+        }
     }
 
     // MARK: - Sanitization

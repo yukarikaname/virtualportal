@@ -1,16 +1,16 @@
 //
-//  CharacterModelController+visionOS.swift
+//  ModelRenderer+visionOS.swift
 //  virtualportal
 //
-//  Created by Yukari Kaname on 11/8/25.
+//  Created by Yukari Kaname on 10/16/25.
 //
-
 #if os(visionOS)
-import SwiftUI
+import Foundation
 import RealityKit
+import simd
 
-/// visionOS-specific functionality for CharacterModelController
-extension CharacterModelController {
+/// visionOS-specific functionality for ModelRenderer
+extension ModelRenderer {
     
     // MARK: - visionOS Setup
     

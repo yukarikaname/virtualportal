@@ -18,6 +18,7 @@ public final class ConversationStateManager: ObservableObject {
     private let speechManager = SpeechConversationManager.shared
     private let llmManager = LLMConversationManager.shared
     private let autoCommentaryManager = AutoCommentaryManager.shared
+    private let characterController = CharacterController.shared
 
     private var cancellables = Set<AnyCancellable>()
     private var conversationTurnCount: Int = 0
@@ -84,20 +85,33 @@ public final class ConversationStateManager: ObservableObject {
 
             Task { @MainActor in
                 if !chunk.isEmpty {
-                    // Remove command syntax and sanitize
-                    var cleanChunk = chunk
-                        .replacingOccurrences(of: #"\[COMMAND:.*?\]"#, with: "", options: .regularExpression)
+                    // Parse actions and get clean text
+                    let (cleanText, actions) = characterController.parseActions(from: chunk)
+                    
+                    // Execute actions in background
+                    if !actions.isEmpty {
+                        Task {
+                            for action in actions {
+                                await characterController.execute(action)
+                            }
+                        }
+                    }
+                    
+                    // Remove memory commands and sanitize
+                    var cleanChunk = cleanText
                         .replacingOccurrences(of: #"\[MEMORY:.*?\]"#, with: "", options: .regularExpression)
-                    // Apply emoji/duplicate removal
                     cleanChunk = self.sanitizeChunk(cleanChunk)
 
                     if !cleanChunk.trimmingCharacters(in: .whitespaces).isEmpty {
-                        speechManager.speakStreamingChunk(cleanChunk)
+                        characterController.setState(.speaking)
+                        // Use SSML-aware speech method (automatically detects and converts to SSML if needed)
+                        speechManager.speakStreamingChunkWithSSML(cleanChunk)
                     }
                 }
 
                 if finished {
                     speechManager.setGenerating(false)
+                    characterController.setState(.idle)
                     conversationTurnCount += 1
                     autoCommentaryManager.updateLastAutoSpeakTime()
                     print("Conversation turn \(conversationTurnCount) complete")
@@ -119,20 +133,33 @@ public final class ConversationStateManager: ObservableObject {
 
             Task { @MainActor in
                 if !chunk.isEmpty {
-                    // Remove command syntax and sanitize
-                    var cleanChunk = chunk
-                        .replacingOccurrences(of: #"\[COMMAND:.*?\]"#, with: "", options: .regularExpression)
+                    // Parse actions and get clean text
+                    let (cleanText, actions) = characterController.parseActions(from: chunk)
+                    
+                    // Execute actions in background
+                    if !actions.isEmpty {
+                        Task {
+                            for action in actions {
+                                await characterController.execute(action)
+                            }
+                        }
+                    }
+                    
+                    // Remove memory commands and sanitize
+                    var cleanChunk = cleanText
                         .replacingOccurrences(of: #"\[MEMORY:.*?\]"#, with: "", options: .regularExpression)
-                    // Apply emoji/duplicate removal
                     cleanChunk = self.sanitizeChunk(cleanChunk)
 
                     if !cleanChunk.trimmingCharacters(in: .whitespaces).isEmpty {
-                        speechManager.speakStreamingChunk(cleanChunk)
+                        characterController.setState(.speaking)
+                        // Use SSML-aware speech method (automatically detects and converts to SSML if needed)
+                        speechManager.speakStreamingChunkWithSSML(cleanChunk)
                     }
                 }
 
                 if finished {
                     speechManager.setGenerating(false)
+                    characterController.setState(.idle)
                     autoCommentaryManager.updateLastAutoSpeakTime()
                     print("Speech request complete")
                 }

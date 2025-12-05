@@ -1,5 +1,5 @@
 //
-//  CharacterModelController+Shaders.swift
+//  ModelRenderer+Shaders.swift
 //  virtualportal
 //
 //  Created by Yukari Kaname on 11/8/25.
@@ -13,8 +13,8 @@ import SwiftUI
 import RealityKit
 import Metal
 
-/// Shader management extension for CharacterModelController
-extension CharacterModelController {
+/// Shader management extension for ModelRenderer
+extension ModelRenderer {
 
     // MARK: - Shader Initialization
 

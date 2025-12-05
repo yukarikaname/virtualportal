@@ -21,7 +21,7 @@ struct virtualportalApp: App {
         Task.detached(priority: .utility) {
             let modelName = UserDefaults.standard.string(forKey: "usdzModelName") ?? ""
             if !modelName.isEmpty {
-                await CharacterModelController.shared.preloadModel(modelName: modelName)
+                await ModelRenderer.shared.preloadModel(modelName: modelName)
             }
         }
     }

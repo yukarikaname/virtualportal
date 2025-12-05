@@ -24,6 +24,6 @@ public class CharacterViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     public func setBlendShape(name: String, value: Float) {
-        CharacterModelController.shared.setBlendShape(name: name, value: value)
+        ModelRenderer.shared.setBlendShape(name: name, value: value)
     }
 }
