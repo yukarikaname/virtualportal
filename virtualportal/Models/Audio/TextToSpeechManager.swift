@@ -181,18 +181,12 @@ public class TextToSpeechManager: NSObject, ObservableObject {
         let utterance: AVSpeechUtterance
         
         if isSSML {
-            // Use SSML initialization (iOS 16.0+)
-            if #available(iOS 16.0, *) {
-                if let ssmlUtterance = AVSpeechUtterance(ssmlRepresentation: text) {
-                    utterance = ssmlUtterance
-                    print("Speaking SSML markup")
-                } else {
-                    print("Invalid SSML markup, falling back to plain text")
-                    utterance = AVSpeechUtterance(string: text)
-                }
+            // Use SSML initialization
+            if let ssmlUtterance = AVSpeechUtterance(ssmlRepresentation: text) {
+                utterance = ssmlUtterance
+                print("Speaking SSML markup")
             } else {
-                // Fallback for older iOS versions
-                print("SSML not supported on this iOS version, using plain text")
+                print("Invalid SSML markup, falling back to plain text")
                 utterance = AVSpeechUtterance(string: text)
             }
         } else {

@@ -17,3 +17,5 @@ redesign onboarding
 iOS:
 livephoto support 
 video supprt
+camera control button support
+lidar 

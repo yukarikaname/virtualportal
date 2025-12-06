@@ -34,7 +34,7 @@ import Foundation
 import RealityKit
 
 // MARK: - Standard Bone Names (English)
-public enum StandardBoneName: String, CaseIterable {
+public enum StandardBoneName: String, CaseIterable, Sendable {
     case rightShoulder = "RightShoulder"
     case rightElbow = "RightElbow"
     case rightWrist = "RightWrist"
@@ -94,7 +94,7 @@ public class IKController {
     ]
     
     // MARK: - Joint Chain Definitions
-    public struct JointChain {
+    public struct JointChain: Sendable {
         public let name: String
         public let standardNames: [StandardBoneName]  // Use standard enum names
         public let constraints: JointConstraints?
@@ -127,7 +127,7 @@ public class IKController {
         }
     }
     
-    public struct JointConstraints {
+    public struct JointConstraints: Sendable {
         public let minAngles: SIMD3<Float>  // Min rotation in degrees
         public let maxAngles: SIMD3<Float>  // Max rotation in degrees
         public let maxBendAngle: Float?     // For single-axis constraints like elbows
@@ -159,6 +159,7 @@ public class IKController {
     
     // MARK: - Timers
     private var procedureTimer: Timer?
+    private var motionTimer: Timer?
     private let procedureUpdateInterval: TimeInterval = 0.016  // ~60fps
     
     private init() {
@@ -321,8 +322,7 @@ public class IKController {
         let boneNames = chain.getBoneNames(with: namingConvention, using: boneNameMap)
         let startPosition = getEndEffectorPosition(boneNames: boneNames, modelEntity: modelEntity)
         
-        var motionTimer: Timer?
-        motionTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { [weak self] _ in
+        motionTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { [weak self] timer in
             let elapsed = Date().timeIntervalSince(startTime)
             let progress = min(1.0, Float(elapsed / duration))
             
@@ -335,10 +335,12 @@ public class IKController {
             }
             
             let currentTarget = simd_mix(startPosition, position, simd_float3(repeating: easeProgress))
-            self?.solveIK(chain: chain, targetPosition: currentTarget, modelEntity: modelEntity)
-            
+            Task { @MainActor in
+                self?.solveIK(chain: chain, targetPosition: currentTarget, modelEntity: modelEntity)
+            }
+
             if progress >= 1.0 {
-                motionTimer?.invalidate()
+                timer.invalidate()
             }
         }
     }
@@ -353,7 +355,9 @@ public class IKController {
     /// Start procedural idle animations
     public func startProceduralMotion() {
         procedureTimer = Timer.scheduledTimer(withTimeInterval: procedureUpdateInterval, repeats: true) { [weak self] _ in
-            self?.updateProceduralMotion()
+            Task { @MainActor in
+                self?.updateProceduralMotion()
+            }
         }
     }
     

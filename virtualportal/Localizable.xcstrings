@@ -49,6 +49,9 @@
     "Cancel" : {
 
     },
+    "Capture" : {
+      "comment" : "Capture action"
+    },
     "Cel Shading" : {
 
     },

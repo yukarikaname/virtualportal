@@ -126,11 +126,6 @@ struct ModelLayerView: View {
                 // Start a minimal AVCaptureSession to enable Camera Control interactions
                 cameraSessionManager.startCameraSession()
                 
-                // Setup iPhone 15+ capture button handler
-                CaptureButtonHandler.shared.setup { 
-                    NotificationCenter.default.post(name: Notification.Name("virtualportal.cameraCaptureRequested"), object: nil)
-                }
-                
                 // Register launch for rate prompt logic (RateManager will invoke in-app review when threshold reached)
                 Task { @MainActor in
                     RateManager.shared.registerLaunch()
@@ -144,10 +139,6 @@ struct ModelLayerView: View {
                 }
                 // Tear down minimal capture session used for Camera Control
                 cameraSessionManager.stopCameraSession()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("virtualportal.captureButtonPressed"))) { _ in
-                // iPhone 15+ capture button was pressed
-                NotificationCenter.default.post(name: Notification.Name("virtualportal.cameraCaptureRequested"), object: nil)
             }
             .onReceive(NotificationCenter.default.publisher(for: Notification.Name("virtualportal.cameraCaptureRequested"))) { _ in
                 // Capture: check camera permission first to avoid crashes when access is denied
